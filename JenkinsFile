@@ -102,7 +102,7 @@ pipeline {
                 }
             }           
 
-            
+            //SMALL CHANGE
             steps {
                 sh '''
                     npm install netlify-cli
