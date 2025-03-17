@@ -24,7 +24,7 @@ pipeline {
             steps{
                 sh '''
                     echo "test stage"
-                    ls /Users/mustafakaanisimbay/learn-jenkins/learn-jenkins-app/build/index.html
+                    ls ../index.html
                 '''
             }
         }
