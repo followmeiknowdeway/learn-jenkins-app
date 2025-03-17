@@ -7,7 +7,7 @@ pipeline {
         line1
         line2
         */
-        /*
+        
         stage('Build') {
             agent{
                 docker {
@@ -29,7 +29,7 @@ pipeline {
             }
         
         }
-        */
+        
         stage('Test'){
             agent{
                 docker {
@@ -65,7 +65,7 @@ pipeline {
                 sh '''
                 
                     npm install serve
-                    node_modules/serve -s build &
+                    sudo node_modules/serve -s build &
                     sleep 10
                     npx playwright test
 
