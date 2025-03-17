@@ -64,9 +64,8 @@ pipeline {
                  */
                 sh '''
                 
-                    npm install serve
-                    sudo node_modules/serve -s build &
-                    sleep 10
+                    npm install -g serve
+                    serve -s build
                     npx playwright test
 
                 '''
