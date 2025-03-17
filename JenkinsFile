@@ -7,7 +7,7 @@ pipeline {
         line1
         line2
         */
-        
+        /*
         stage('Build') {
             agent{
                 docker {
@@ -29,6 +29,7 @@ pipeline {
             }
         
         }
+        */
         
         stage('Test'){
             agent{
