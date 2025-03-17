@@ -7,6 +7,7 @@ pipeline {
         line1
         line2
         */
+        /*
         stage('Build') {
             agent{
                 docker {
@@ -26,8 +27,9 @@ pipeline {
                     ls -la
                 '''
             }
+        */
         }
-        stage('test'){
+        stage('Test'){
             agent{
                 docker {
                     image 'node:18-alpine'
@@ -42,6 +44,31 @@ pipeline {
                 '''
             }
         }
+        stage('E2E'){
+            agent{
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.51.0-noble'
+                    reuseNode true
+                }
+            }            
+            steps{
+                /*
+                for global:
+                npm install -g serve
+                serve -s build
+                .
+                .
+                .
+                 */
+                sh '''
+                
+                    npm install serve
+                    node_modules/serve -s build
+                    npx playwright test
+
+                '''
+            }
+        }        
     }
     post {
         always {
