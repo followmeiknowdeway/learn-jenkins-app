@@ -8,11 +8,12 @@ pipeline {
     }
 
     stages {
-        // comment
-        /*
-        line1
-        line2
-        */
+
+        stage('docker'){
+            steps{
+                sh 'docker build my-playwright .'
+            }
+        }
         
         stage('Build') {
             agent{
@@ -98,22 +99,31 @@ pipeline {
         stage('Deploy staging') {
             agent{
                 docker {
-                    image 'node:18-alpine'
+                    image 'my-playwright'
                     reuseNode true
                 }
+            }
+            environment{
+                CI_ENVIRONMENT_URL = ''
             }           
 
             //SMALL CHANGE
             steps {
                 sh '''
-                    npm install netlify-cli node-jq
-                    node_modules/.bin/netlify --version
-                    node_modules/.bin/netlify status
+                    
+                    netlify --version
+                    netlify status
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
-                    node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
+                    netlify deploy --dir=build --json > deploy-output.json
+                    CI_ENVIRONMENT_URL=$(node-jq -r '.deploy_url' deploy-output.json)
+                    npx playwright test --reporter=html
 
                 '''
+            }
+            post{
+                always{
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'HTML Report-3', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         
         }
@@ -127,37 +137,23 @@ pipeline {
         stage('Deploy prod') {
             agent{
                 docker {
-                    image 'node:18-alpine'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }           
 
-            //SMALL CHANGE
-            steps {
-                sh '''
-                    npm install netlify-cli
-                    node_modules/.bin/netlify --version
-                    node_modules/.bin/netlify status
-                    echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify deploy --dir=build --prod
-                '''
-            }
-        
-        }        
-        stage('Prod E2E'){
-            agent{
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    reuseNode true
-                }
-            }
+            
             environment{
                 CI_ENVIRONMENT_URL = 'https://euphonious-custard-5d48f4.netlify.app'
             }            
             steps{
 
                 sh '''
-                
+                    node --version
+                    netlify --version
+                    echo "deployin prod"
+                    netlify status
+                    netlify deploy --dir=build --prod
                     npx playwright test --reporter=html
 
                 '''
@@ -165,12 +161,12 @@ pipeline {
             post {
                 always {
                     
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'HTML Report-2', reportTitles: '', useWrapperFileDirectly: true])
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'prod Report-2', reportTitles: '', useWrapperFileDirectly: true])
                 }
-            }                
+            } 
         
-        
-        }
+        }        
+
     }
 
     
