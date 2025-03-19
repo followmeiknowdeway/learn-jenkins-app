@@ -45,7 +45,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'aws-s3', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh '''
                         aws --version
-                        sudo yum install jq -y
+                        sudo apt update
+                        sudo apt yum install jq -y
                         LATEST=$(aws ecs register-task-definition --cli-input-json file://aws/task.json | jq '.taskDefinition.revision')
                         aws ecs update-service --cluster learn --service ax --task-definition $LATEST
                         
