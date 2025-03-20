@@ -28,7 +28,7 @@ pipeline {
                         LATEST=$(aws ecs register-task-definition --cli-input-json file://aws/task.json | jq '.taskDefinition.revision')
                         echo $LATEST
                         aws ecs update-service --cluster learn --service ax --task-definition learn:$LATEST
-                        
+                        aws ecs wait services-stable --cluster learn --services ax
 
                         
                     '''
