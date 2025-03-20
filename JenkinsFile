@@ -33,7 +33,7 @@ pipeline {
             agent{
                 docker{
                     image 'amazon/aws-cli:latest'
-                    args "-u root--entrypoint=''"
+                    args "-u root --entrypoint=''"
                     reuseNode true
                 }
             }
